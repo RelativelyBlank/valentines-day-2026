@@ -374,8 +374,8 @@
         /* Book container */
         .book-container {
             position: relative;
-            width: 800px;
-            height: 600px;
+            width: 900px;
+            height: 800px;
             transform-style: preserve-3d;
         }
 
@@ -395,6 +395,7 @@
             transition: transform 2s ease;
             z-index: 2;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            backface-visibility: hidden;
         }
 
         .book-cover.open {
@@ -407,7 +408,6 @@
             color: #000;
             text-align: center;
             font-family: 'Georgia', serif;
-            backface-visibility: hidden;
         }
 
         .crossword-container {
@@ -654,13 +654,25 @@
             transform: translate(-50%, -50%);
             background: #e5e5ea;
             padding: 1vh 2vw;
-            border-radius: 1.5vh;
+            border-radius: 2vh;
             font-size: 1.8vh;
             color: #000;
             max-width: 18vw;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
             z-index: 103;
             display: none;
+        }
+
+        .message-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -1vh;
+            left: 15%;
+            width: 2vh;
+            height: 2vh;
+            background: #e5e5ea;
+            border-radius: 0 0 100% 0;
+            box-shadow: 0 2px 3px rgba(0, 0, 0, 0.15);
         }
 
         .message-bubble.active {
@@ -674,13 +686,25 @@
             transform: translate(-50%, -50%);
             background: #e5e5ea;
             padding: 1vh 2vw;
-            border-radius: 1.5vh;
+            border-radius: 2vh;
             font-size: 1.8vh;
             color: #000;
             max-width: 18vw;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
             z-index: 103;
             display: none;
+        }
+
+        .message-bubble-2::after {
+            content: '';
+            position: absolute;
+            bottom: -1vh;
+            left: 15%;
+            width: 2vh;
+            height: 2vh;
+            background: #e5e5ea;
+            border-radius: 0 0 100% 0;
+            box-shadow: 0 2px 3px rgba(0, 0, 0, 0.15);
         }
 
         .message-bubble-2.active {
@@ -843,7 +867,7 @@
             left: 50%;
             transform: translateX(-50%) translateY(100%);
             width: 90%;
-            height: 350px;
+            height: 600px;
             background: #f9f4e8;
             border: 2px solid #d4c5a9;
             border-radius: 4px;
@@ -896,41 +920,50 @@
 
         .letter-buttons {
             display: flex;
-            gap: 20px;
+            gap: 40px;
             justify-content: center;
             margin-top: 20px;
+            font-family: 'Georgia', serif;
         }
 
-        .valentine-btn {
-            padding: 15px 40px;
-            border: none;
-            border-radius: 8px;
+        .checkbox-option {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
             cursor: pointer;
+        }
+
+        .checkbox-box {
+            width: 60px;
+            height: 60px;
+            border: 3px solid #333;
+            background: white;
+            position: relative;
+            transition: background 0.2s;
+        }
+
+        .checkbox-box::before {
+            content: '✗';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 48px;
+            color: #333;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-family: 'Georgia', serif;
+        }
+
+        .checkbox-option:hover .checkbox-box::before {
+            opacity: 1;
+        }
+
+        .checkbox-label {
             font-size: 18px;
-            font-weight: bold;
-            transition: transform 0.2s;
-        }
-
-        .valentine-btn:hover {
-            transform: scale(1.05);
-        }
-
-        .valentine-yes {
-            background: #4CAF50;
-            color: white;
-        }
-
-        .valentine-yes:hover {
-            background: #45a049;
-        }
-
-        .valentine-no {
-            background: #f44336;
-            color: white;
-        }
-
-        .valentine-no:hover {
-            background: #d32f2f;
+            color: #333;
+            font-family: 'Georgia', serif;
         }
 
         .close-letter {
@@ -957,49 +990,94 @@
         /* Virus alert modal */
         .virus-alert {
             position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: white;
-            border: 3px solid red;
-            padding: 30px;
-            border-radius: 8px;
+            background: #c0c0c0;
+            border: 3px outset #dfdfdf;
+            padding: 3px;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
             z-index: 10002;
             display: none;
-            max-width: 500px;
-            text-align: center;
+            width: 450px;
+            font-family: 'Tahoma', sans-serif;
         }
 
         .virus-alert.active {
             display: block;
         }
 
-        .virus-alert h2 {
+        .virus-alert-titlebar {
+            background: linear-gradient(to right, #0059a1, #1e8ce0);
+            color: white;
+            padding: 3px 5px;
+            font-size: 12px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            margin-bottom: 3px;
+        }
+
+        .virus-alert-icon {
+            width: 16px;
+            height: 16px;
+            margin-right: 5px;
+        }
+
+        .virus-alert-content {
+            background: white;
+            padding: 20px;
+            display: flex;
+            gap: 15px;
+            align-items: flex-start;
+        }
+
+        .virus-alert-warning-icon {
+            font-size: 48px;
             color: red;
-            margin-bottom: 15px;
-            font-size: 24px;
+            flex-shrink: 0;
+        }
+
+        .virus-alert-text {
+            text-align: left;
+        }
+
+        .virus-alert h2 {
+            color: #000;
+            margin-bottom: 10px;
+            font-size: 16px;
+            font-weight: bold;
         }
 
         .virus-alert p {
-            color: #333;
-            margin-bottom: 20px;
-            font-size: 16px;
+            color: #000;
+            margin-bottom: 10px;
+            font-size: 13px;
             text-indent: 0;
+            line-height: 1.4;
+        }
+
+        .virus-alert-buttons {
+            background: #c0c0c0;
+            padding: 10px;
+            text-align: center;
+            border-top: 1px solid #808080;
         }
 
         .virus-alert button {
-            background: #2196F3;
-            color: white;
-            border: none;
-            padding: 10px 30px;
-            border-radius: 4px;
+            background: #c0c0c0;
+            color: #000;
+            border: 2px outset #dfdfdf;
+            padding: 5px 20px;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 13px;
+            font-family: 'Tahoma', sans-serif;
+            min-width: 80px;
         }
 
         .virus-alert button:hover {
-            background: #1976D2;
+            background: #d4d4d4;
+        }
+
+        .virus-alert button:active {
+            border-style: inset;
         }
 
         /* Thinking message */
@@ -1122,7 +1200,7 @@
             font-size: 24px;
             line-height: 2;
             padding: 50px;
-            animation: rollCredits 20s linear forwards;
+            animation: rollCredits 40s linear forwards;
             position: relative;
             z-index: 10005;
         }
@@ -1302,28 +1380,50 @@
                 </div>
             </div>
             <div class="letter" id="letter">
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
-                <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-                <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.</p>
-                <p>With love,<br>Your Secret Admirer</p>
+                <p>Dear Maddie,</p>
+                <p>I hope you enjoyed your trip to Vietnam! I'm so jealous that I couldn't come with you, but I know you had some great experiences. I'm really missing you and can't wait to see you in April.</p>
+                <p>I am think about our vibrant future together and waking up next to you. I am really happy that you are living your dream out in Korea, but it's been so hard with the time difference and not being able to see you every day like we did back at UF.</p>
+                <p>Last Valentine's Day was so memorable with how happy you were when I gave you the gift basket full of British snacks. Though I can't give you a gift physically this year, I want to make sure that you know that I put in as much effort as I could to make you feel special.</p>
+                <p>I made this game to help me imagine what it would be like to be in your shoes and though it might be inaccurate, it did make me feel as if I will be there.</p>      
+                <p></p>
+                <p>I love you most now, forever and always.</p>
 
                 <div class="letter-question">Will you be my valentine?</div>
                 <div class="letter-buttons">
-                    <button class="valentine-btn valentine-yes" id="valentine-yes">Yes</button>
-                    <button class="valentine-btn valentine-no" id="valentine-no">No</button>
+                    <div class="checkbox-option" id="valentine-yes">
+                        <div class="checkbox-box"></div>
+                        <div class="checkbox-label">Yes</div>
+                    </div>
+                    <div class="checkbox-option" id="valentine-no">
+                        <div class="checkbox-box"></div>
+                        <div class="checkbox-label">No</div>
+                    </div>
                 </div>
             </div>
         </div>
         <button class="close-letter" id="close-letter">Close</button>
     </div>
 
-    <!-- Virus alert modal -->
-    <div class="virus-alert" id="virus-alert">
-        <h2>⚠️ WARNING ⚠️</h2>
-        <p>CRITICAL SYSTEM ERROR: Malicious activity detected. Your system has been compromised and will be infected with a virus if you proceed with this action.</p>
-        <p><strong>Error Code: 0x80070057</strong></p>
-        <p>Please reconsider your choice to prevent permanent damage to your device.</p>
-        <button id="close-virus-alert">OK</button>
+    <!-- Virus alert modal template -->
+    <div class="virus-alert" id="virus-alert-template" style="display: none;">
+        <div class="virus-alert-titlebar">
+            <span class="virus-alert-icon">⚠️</span>
+            <span>Windows Security Alert</span>
+        </div>
+        <div class="virus-alert-content">
+            <div class="virus-alert-warning-icon">⚠️</div>
+            <div class="virus-alert-text">
+                <h2>CRITICAL SYSTEM ERROR</h2>
+                <p><strong>Error Code: 0x80070057</strong></p>
+                <p>Malicious activity detected! Your system has been compromised and will be infected with a TROJAN VIRUS if you proceed with this action.</p>
+                <p>⚠️ WARNING: All your personal files will be encrypted!</p>
+                <p><strong>Contact Microsoft Support immediately: 1-800-VIRUS-HELP</strong></p>
+                <p>Click OK to prevent permanent damage to your device.</p>
+            </div>
+        </div>
+        <div class="virus-alert-buttons">
+            <button class="close-virus-btn">OK</button>
+        </div>
     </div>
 
     <!-- Thinking message -->
@@ -1353,12 +1453,10 @@
             <p>Claude Sonnet 4.5</p>
 
             <p class="role">Art & Graphics</p>
-            <p>Jeffrey Ma</p>
+            <p>ChatGPT 5.2</p>
+            
 
-            <p class="role">Special Thanks</p>
-            <p>Maddie</p>
-
-            <h2>🎮 THE END 🎮</h2>
+            <h2>🎮 Fin 🎮</h2>
 
             <p style="margin-top: 100px;">Made with ❤️ for Valentine's Day</p>
         </div>
@@ -1388,9 +1486,10 @@
         const closeLetterBtn = document.getElementById('close-letter');
         const valentineYesBtn = document.getElementById('valentine-yes');
         const valentineNoBtn = document.getElementById('valentine-no');
-        const virusAlert = document.getElementById('virus-alert');
-        const closeVirusAlertBtn = document.getElementById('close-virus-alert');
+        const virusAlertTemplate = document.getElementById('virus-alert-template');
         const thinkingMessage = document.getElementById('thinking-message');
+        let virusAlertCount = 1; // Track how many times "No" has been pressed
+        let activeVirusAlerts = []; // Track active virus alert elements
         const envelopeWrapper = document.getElementById('envelope-wrapper');
         const envelopeFlap = document.getElementById('envelope-flap');
         const heartSealTop = document.getElementById('heart-seal-top');
@@ -1578,6 +1677,11 @@
             if (key === 'e' && gameState === 'phone') {
                 closePhone();
             } else if (key === 'e' && gameState === 'starting-room') {
+                // Don't allow any E interactions until phone notification appears
+                if (!phoneVibratedInStartingRoom) {
+                    return;
+                }
+
                 // Check if phone is open
                 if (phoneOpen) {
                     closePhone();
@@ -1599,6 +1703,11 @@
                     }
                 }
             } else if (key === 'e' && gameState === 'city') {
+                // Don't allow any E interactions until phone notification appears
+                if (!phoneVibratedInCity) {
+                    return;
+                }
+
                 // Check if player wants to open phone
                 if (!cityPhoneMessageSeen) {
                     openPhone();
@@ -1882,12 +1991,12 @@
         // Click on smartphone to open
         smartphone.addEventListener('click', () => {
             if (!phoneOpen && (gameState === 'starting-room' || gameState === 'city' || gameState === 'dorm-room')) {
-                // Starting room: show notification before test
-                if (gameState === 'starting-room' && !phoneMessageSeen && !testCompleted) {
+                // Starting room: show notification before test (only after vibration)
+                if (gameState === 'starting-room' && !phoneMessageSeen && !testCompleted && phoneVibratedInStartingRoom) {
                     openPhone();
                 }
-                // City: show notification after completing test
-                else if (gameState === 'city' && !cityPhoneMessageSeen) {
+                // City: show notification after completing test (only after vibration)
+                else if (gameState === 'city' && !cityPhoneMessageSeen && phoneVibratedInCity) {
                     openPhone();
                 }
             }
@@ -1981,6 +2090,10 @@
 
         // Close letter modal
         function closeLetterModal() {
+            // Close all active virus alerts
+            activeVirusAlerts.forEach(alert => alert.remove());
+            activeVirusAlerts = [];
+
             letterModal.classList.remove('active');
             letter.classList.remove('slide-out');
             envelopeFlap.classList.remove('open');
@@ -1996,6 +2109,11 @@
 
             // Mark letter as opened
             letterOpened = true;
+
+            // Close all active virus alerts
+            activeVirusAlerts.forEach(alert => alert.remove());
+            activeVirusAlerts = [];
+            virusAlertCount = 1; // Reset count
 
             // Close the letter modal and reset animations
             letterModal.classList.remove('active');
@@ -2019,15 +2137,46 @@
 
         // Valentine No button
         valentineNoBtn.addEventListener('click', () => {
-            console.log('Player said No - showing virus alert');
-            virusAlert.classList.add('active');
+            console.log('Player said No - showing virus alerts');
+
+            // Create multiple virus alerts (doubles each time)
+            const alertsToCreate = virusAlertCount;
+
+            for (let i = 0; i < alertsToCreate; i++) {
+                createVirusAlert();
+            }
+
+            // Double the count for next time
+            virusAlertCount *= 2;
         });
 
-        // Close virus alert
-        closeVirusAlertBtn.addEventListener('click', () => {
-            virusAlert.classList.remove('active');
-            // Letter stays open, player must choose again
-        });
+        // Create a virus alert at random position
+        function createVirusAlert() {
+            const alert = virusAlertTemplate.cloneNode(true);
+            alert.id = ''; // Remove ID so it's not a duplicate
+            alert.style.display = 'block';
+
+            // Random position on screen
+            const maxX = window.innerWidth - 450; // Alert width
+            const maxY = window.innerHeight - 300; // Approximate alert height
+            const randomX = Math.random() * maxX;
+            const randomY = Math.random() * maxY;
+
+            alert.style.left = randomX + 'px';
+            alert.style.top = randomY + 'px';
+            alert.style.transform = 'none';
+
+            // Add close button handler
+            const closeBtn = alert.querySelector('.close-virus-btn');
+            closeBtn.addEventListener('click', () => {
+                alert.remove();
+                // Remove from active alerts array
+                activeVirusAlerts = activeVirusAlerts.filter(a => a !== alert);
+            });
+
+            document.body.appendChild(alert);
+            activeVirusAlerts.push(alert);
+        }
 
         // Create confetti explosion
         function createConfetti() {
@@ -2113,25 +2262,25 @@
         // Create moving images in credits from credits_images folder
         function createMovingImages() {
             // List of images to load from the credits_images folder
-            // User should create a folder called "credits_images" and place images there
+            // Add your image filenames here (can be any name/format)
             const imageFiles = [
-                'image1.jpg',
-                'image2.jpg',
-                'image3.jpg',
-                'image4.jpg',
-                'image5.jpg',
-                'image6.jpg',
-                'image7.jpg',
-                'image8.jpg',
-                'image9.jpg',
-                'image10.jpg'
+                'IMG_7771.jpg',
+                'IMG_7772.jpg',
+                'IMG_7773.jpg',
+                'IMG_7774.jpg',
+                'IMG_7775.jpg',
+                'IMG_7776.jpg',
+                'seoul_after_temple.png',
+                'seoul_before_temple.png',
+                'skyline_only.png'
             ];
 
-            let imageIndex = 0;
-
             setInterval(() => {
+                // Pick a random image from the list
+                const randomIndex = Math.floor(Math.random() * imageFiles.length);
+
                 const img = document.createElement('img');
-                img.src = 'credits_images/' + imageFiles[imageIndex % imageFiles.length];
+                img.src = 'credits_images/' + imageFiles[randomIndex];
                 img.className = 'credits-image move';
                 img.style.top = (Math.random() * 70 + 10) + '%';
                 img.style.height = (Math.random() * 100 + 100) + 'px';
@@ -2148,8 +2297,6 @@
                 setTimeout(() => {
                     img.remove();
                 }, 15000);
-
-                imageIndex++;
             }, 3000);
         }
 
@@ -2341,10 +2488,10 @@
                     facingLeft = false;
                 }
 
-                // Show E prompt when near the door (right side)
-                if (playerPosition < -300) {
+                // Show E prompt when near the door (right side) - only after notification appears
+                if (playerPosition < -300 && phoneVibratedInStartingRoom) {
                     if (testCompleted) {
-                        ePrompt.textContent = 'Press E to enter';
+                        ePrompt.textContent = 'Press E to exit';
                     } else {
                         ePrompt.innerHTML = 'Complete the test first!';
                     }
@@ -2354,7 +2501,7 @@
                 }
 
                 // Show middle popup when in the center (only after viewing phone message and before completing test)
-                if (Math.abs(playerPosition) < 50 && phoneMessageSeen && !testCompleted) {
+                if (Math.abs(playerPosition) < 50 && phoneMessageSeen && !testCompleted && phoneVibratedInStartingRoom) {
                     middlePopup.style.display = 'block';
                     inMiddleArea = true;
                 } else {
@@ -2387,8 +2534,8 @@
                     facingLeft = false;
                 }
 
-                // Show E prompt when near the right end (only if city message seen)
-                if (worldPosition <= maxWorldPosition + 50 && cityPhoneMessageSeen) {
+                // Show E prompt when near the right end (only if city message seen and notification appeared)
+                if (worldPosition <= maxWorldPosition + 50 && cityPhoneMessageSeen && phoneVibratedInCity) {
                     cityEPrompt.style.display = 'block';
                 } else {
                     cityEPrompt.style.display = 'none';
