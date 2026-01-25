@@ -1,0 +1,2475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Move Left and Right</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            height: 100vh;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+            position: relative;
+        }
+
+        /* Starting room background */
+        .starting-room {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('test_background.png');
+            background-size: cover;
+            background-position: center;
+            z-index: 1;
+        }
+
+        /* Dorm room background */
+        .dorm-room {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('yonsei_dorm.png');
+            background-size: cover;
+            background-position: center;
+            z-index: 1;
+            display: none;
+        }
+
+        /* Heart message next to mailbox */
+        .heart-message {
+            position: absolute;
+            left: 15%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 45vh;
+            height: 45vh;
+            background-image: url('heart_message.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            z-index: 2;
+            display: none;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: translate(-50%, -50%) scale(1);
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.2);
+            }
+        }
+
+        /* Background layer - stars and sky */
+        .background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, #0a0e27 0%, #1a1f4d 50%, #2d3561 100%);
+            z-index: 1;
+            display: none;
+            pointer-events: none;
+        }
+
+        /* Sky effects layer - above city */
+        .sky-effects {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 3;
+            pointer-events: none;
+            display: none;
+        }
+
+        /* Stars */
+        .stars {
+            position: absolute;
+            width: 100%;
+            height: 60%;
+            top: 0;
+            background-image:
+                radial-gradient(3px 3px at 20% 15%, white, transparent),
+                radial-gradient(2px 2px at 60% 25%, white, transparent),
+                radial-gradient(3px 3px at 50% 10%, white, transparent),
+                radial-gradient(2px 2px at 80% 5%, white, transparent),
+                radial-gradient(4px 4px at 90% 20%, white, transparent),
+                radial-gradient(2px 2px at 33% 30%, white, transparent),
+                radial-gradient(3px 3px at 75% 12%, white, transparent),
+                radial-gradient(2px 2px at 15% 8%, white, transparent),
+                radial-gradient(3px 3px at 45% 18%, white, transparent),
+                radial-gradient(2px 2px at 70% 22%, white, transparent),
+                radial-gradient(3px 3px at 25% 20%, white, transparent),
+                radial-gradient(2px 2px at 85% 28%, white, transparent),
+                radial-gradient(4px 4px at 40% 14%, white, transparent),
+                radial-gradient(2px 2px at 95% 10%, white, transparent),
+                radial-gradient(3px 3px at 10% 25%, white, transparent),
+                radial-gradient(2px 2px at 55% 8%, white, transparent);
+            background-size: 100% 100%;
+            background-position: 0% 0%;
+            animation: twinkle 2s ease-in-out infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% {
+                opacity: 0.8;
+            }
+            50% {
+                opacity: 1;
+            }
+        }
+
+        /* Cloud layer */
+        .cloud {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 100px;
+        }
+
+        .cloud::before,
+        .cloud::after {
+            content: '';
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 100px;
+        }
+
+        .cloud1 {
+            width: 100px;
+            height: 40px;
+            top: 20%;
+            left: 10%;
+        }
+
+        .cloud1::before {
+            width: 50px;
+            height: 50px;
+            top: -25px;
+            left: 10px;
+        }
+
+        .cloud1::after {
+            width: 60px;
+            height: 40px;
+            top: -15px;
+            right: 10px;
+        }
+
+        .cloud2 {
+            width: 120px;
+            height: 50px;
+            top: 35%;
+            left: 60%;
+        }
+
+        .cloud2::before {
+            width: 60px;
+            height: 60px;
+            top: -30px;
+            left: 15px;
+        }
+
+        .cloud2::after {
+            width: 70px;
+            height: 50px;
+            top: -20px;
+            right: 15px;
+        }
+
+        .cloud3 {
+            width: 80px;
+            height: 35px;
+            top: 15%;
+            left: 85%;
+        }
+
+        .cloud3::before {
+            width: 40px;
+            height: 40px;
+            top: -20px;
+            left: 10px;
+        }
+
+        .cloud3::after {
+            width: 50px;
+            height: 35px;
+            top: -15px;
+            right: 10px;
+        }
+
+        /* Midground - city skyline */
+        .midground {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 70vh;
+            display: flex;
+            flex-direction: row;
+            z-index: 2;
+        }
+
+        .city-segment {
+            height: 100%;
+            flex-shrink: 0;
+            background-size: auto 100%;
+            background-repeat: no-repeat;
+            background-position: bottom left;
+        }
+
+        /* Foreground - road */
+        .foreground {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 60vh;
+            background-image: url('road_8bit.png');
+            background-repeat: repeat-x;
+            background-position: bottom;
+            background-size: auto 100%;
+            z-index: 3;
+        }
+
+        /* Player character */
+        #player {
+            width: 25vh;
+            height: 25vh;
+            background-image: url('maddie_still.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            position: absolute;
+            left: 50%;
+            bottom: 10vh;
+            transform: translateX(-50%);
+            z-index: 4;
+            transition: transform 0.1s ease;
+        }
+
+        /* Player in starting room - bigger and lower */
+        .starting-room-active #player {
+            width: 55vh;
+            height: 55vh;
+            bottom: 0vh;
+        }
+
+        /* Player size in dorm room */
+        body.dorm-room-active #player {
+            width: 55vh;
+            height: 55vh;
+            bottom: 0vh;
+        }
+
+        .instructions {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            font-size: 18px;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 15px 30px;
+            border-radius: 8px;
+            z-index: 5;
+        }
+
+        /* E prompt */
+        .e-prompt {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 24px;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 20px 40px;
+            border-radius: 12px;
+            z-index: 6;
+            display: none;
+        }
+
+        /* City E prompt - for entering dorm */
+        .city-e-prompt {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 24px;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 20px 40px;
+            border-radius: 12px;
+            z-index: 6;
+            display: none;
+        }
+
+        /* Dorm E prompt - for opening letter */
+        .dorm-e-prompt {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 24px;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 20px 40px;
+            border-radius: 12px;
+            z-index: 6;
+            display: none;
+        }
+
+        /* Middle popup */
+        .middle-popup {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 20px;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 30px 50px;
+            border-radius: 12px;
+            z-index: 7;
+            display: none;
+            max-width: 500px;
+        }
+
+        /* Word search modal */
+        .crossword-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            perspective: 2000px;
+        }
+
+        .crossword-modal.active {
+            display: flex !important;
+        }
+
+        /* Book container */
+        .book-container {
+            position: relative;
+            width: 800px;
+            height: 600px;
+            transform-style: preserve-3d;
+        }
+
+        /* Book cover */
+        .book-cover {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: white;
+            border: 5px solid #333;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transform-origin: left center;
+            transform-style: preserve-3d;
+            transition: transform 2s ease;
+            z-index: 2;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .book-cover.open {
+            transform: rotateY(-180deg);
+        }
+
+        .book-cover-text {
+            font-size: 48px;
+            font-weight: bold;
+            color: #000;
+            text-align: center;
+            font-family: 'Georgia', serif;
+            backface-visibility: hidden;
+        }
+
+        .crossword-container {
+            position: absolute;
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            z-index: 1;
+        }
+
+        .crossword-container h2 {
+            margin: 0 0 20px 0;
+            color: #333;
+            text-align: center;
+        }
+
+        .crossword-grid {
+            display: grid;
+            grid-template-columns: repeat(10, 45px);
+            gap: 3px;
+            margin: 20px auto;
+            width: fit-content;
+            background: #ddd;
+            padding: 10px;
+            border-radius: 8px;
+            min-height: 100px;
+        }
+
+        .crossword-cell {
+            width: 45px;
+            height: 45px;
+            border: 1px solid #999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: bold;
+            text-transform: uppercase;
+            background: white;
+            cursor: pointer;
+            user-select: none;
+            color: #333;
+        }
+
+        .crossword-cell.selected {
+            background: #ffeb3b;
+        }
+
+        .crossword-cell.found {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .word-list {
+            margin-top: 20px;
+            color: #333;
+            text-align: center;
+        }
+
+        .word-list h3 {
+            margin: 10px 0;
+        }
+
+        .words-to-find {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .word-item {
+            padding: 8px 16px;
+            background: #f0f0f0;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+
+        .word-item.found {
+            background: #4CAF50;
+            color: white;
+            text-decoration: line-through;
+        }
+
+        .close-modal {
+            background: #333;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        .close-modal:hover {
+            background: #000;
+        }
+
+        .submit-crossword {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+            width: 100%;
+        }
+
+        .submit-crossword:hover {
+            background: #45a049;
+        }
+
+        /* Fade overlay */
+        .fade-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: black;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 10;
+            transition: opacity 2s ease;
+        }
+
+        .fade-overlay.active {
+            opacity: 1;
+        }
+
+        /* Hide city elements initially */
+        .city-scene {
+            display: none;
+        }
+
+        /* Smartphone */
+        .smartphone {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 120px;
+            height: 200px;
+            background-image: url('smartphone.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            cursor: pointer;
+            z-index: 100;
+            transition: all 0.5s ease;
+        }
+
+        .smartphone.vibrate {
+            animation: vibrate 0.15s ease-in-out 2;
+        }
+
+        @keyframes vibrate {
+            0%, 100% {
+                transform: translateX(0) rotate(0deg);
+            }
+            25% {
+                transform: translateX(-5px) rotate(-3deg);
+            }
+            50% {
+                transform: translateX(5px) rotate(3deg);
+            }
+            75% {
+                transform: translateX(-5px) rotate(-3deg);
+            }
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 28px;
+            height: 28px;
+            background: #ff0000;
+            border: 2px solid white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: bold;
+            color: white;
+            z-index: 101;
+        }
+
+        .notification-badge.hidden {
+            display: none;
+        }
+
+        .phone-prompt {
+            position: absolute;
+            top: 230px;
+            right: 20px;
+            color: white;
+            font-size: 16px;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px 15px;
+            border-radius: 8px;
+            z-index: 100;
+            display: none;
+        }
+
+        /* Enlarged phone view */
+        .smartphone.enlarged {
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100vw;
+            height: 100vh;
+            background-image: url('smartphone_with_contact.png');
+        }
+
+        .phone-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 99;
+            display: none;
+        }
+
+        .phone-overlay.active {
+            display: block;
+        }
+
+        .message-bubble {
+            position: fixed;
+            top: 48%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #e5e5ea;
+            padding: 1vh 2vw;
+            border-radius: 1.5vh;
+            font-size: 1.8vh;
+            color: #000;
+            max-width: 18vw;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            z-index: 103;
+            display: none;
+        }
+
+        .message-bubble.active {
+            display: block;
+        }
+
+        .message-bubble-2 {
+            position: fixed;
+            top: 58%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #e5e5ea;
+            padding: 1vh 2vw;
+            border-radius: 1.5vh;
+            font-size: 1.8vh;
+            color: #000;
+            max-width: 18vw;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            z-index: 103;
+            display: none;
+        }
+
+        .message-bubble-2.active {
+            display: block;
+        }
+
+        .close-phone-prompt {
+            position: fixed;
+            top: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            font-size: 18px;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px 30px;
+            border-radius: 10px;
+            z-index: 102;
+            display: none;
+        }
+
+        /* Letter modal */
+        .letter-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 9999;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .letter-modal.active {
+            display: flex;
+        }
+
+        .envelope-container {
+            position: relative;
+            width: 600px;
+            height: 400px;
+            perspective: 1000px;
+            transform-style: preserve-3d;
+        }
+
+        .envelope-wrapper {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            transition: transform 2s;
+        }
+
+        .envelope-wrapper.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .envelope-front {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: #d4a574;
+            border: 3px solid #8b6f47;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Georgia', serif;
+            z-index: 2;
+        }
+
+        .envelope-front .to-line {
+            font-size: 28px;
+            color: #3d2817;
+            margin-bottom: 10px;
+        }
+
+        .envelope-front .from-line {
+            font-size: 24px;
+            color: #5d4027;
+            font-style: italic;
+        }
+
+        .envelope {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: #d4a574;
+            border: 3px solid #8b6f47;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            z-index: 1;
+            backface-visibility: hidden;
+            transform: rotateY(180deg);
+        }
+
+        .envelope-flap {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 70%;
+            background: linear-gradient(135deg, #c89d6b 0%, #d4a574 50%, #c89d6b 100%);
+            clip-path: polygon(0 0, 50% 70%, 100% 0);
+            border-bottom: 2px solid #8b6f47;
+            transform-origin: top center;
+            transition: transform 1s ease;
+            z-index: 2;
+            filter: drop-shadow(0 0 1px #2a2419) drop-shadow(0 0 1px #2a2419);
+        }
+
+        .envelope-flap.open {
+            animation: openFlap 1s forwards;
+        }
+
+        @keyframes openFlap {
+            0% {
+                transform: rotateX(0deg);
+            }
+            100% {
+                transform: rotateX(-180deg);
+            }
+        }
+
+        .heart-seal-top {
+            position: absolute;
+            top: 35%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 30px;
+            background: #c41e3a;
+            z-index: 4;
+            clip-path: polygon(50% 40%, 61% 22%, 74% 20%, 85% 34%, 91% 60%, 88% 90%, 50% 100%, 12% 90%, 9% 60%, 15% 34%, 26% 20%, 39% 22%);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .heart-seal-bottom {
+            position: absolute;
+            top: 35%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 30px;
+            background: #c41e3a;
+            z-index: 3;
+            clip-path: polygon(50% 0%, 88% 0%, 50% 100%, 12% 0%);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+            margin-top: 15px;
+        }
+
+        .letter {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translateX(-50%) translateY(100%);
+            width: 90%;
+            height: 350px;
+            background: #f9f4e8;
+            border: 2px solid #d4c5a9;
+            border-radius: 4px;
+            padding: 40px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            font-family: 'Georgia', serif;
+            font-size: 16px;
+            line-height: 1.6;
+            color: #333;
+            overflow-y: auto;
+            opacity: 0;
+            z-index: 10;
+        }
+
+        .letter.slide-out {
+            animation: slideOut 3s forwards;
+        }
+
+        @keyframes slideOut {
+            0% {
+                transform: translateX(-50%) translateY(100%);
+                opacity: 0;
+            }
+            40% {
+                transform: translateX(-50%) translateY(0%);
+                opacity: 1;
+            }
+            70% {
+                transform: translateX(-50%) translateY(-20%);
+                opacity: 1;
+            }
+            100% {
+                transform: translateX(-50%) translateY(-50%) scale(1.2);
+                opacity: 1;
+            }
+        }
+
+        .letter p {
+            margin-bottom: 15px;
+            text-indent: 30px;
+        }
+
+        .letter-question {
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            margin: 30px 0 20px 0;
+            color: #8b6f47;
+        }
+
+        .letter-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .valentine-btn {
+            padding: 15px 40px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+
+        .valentine-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .valentine-yes {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .valentine-yes:hover {
+            background: #45a049;
+        }
+
+        .valentine-no {
+            background: #f44336;
+            color: white;
+        }
+
+        .valentine-no:hover {
+            background: #d32f2f;
+        }
+
+        .close-letter {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #8b6f47;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            z-index: 10001;
+            display: none;
+        }
+
+        .close-letter:hover {
+            background: #6d5739;
+        }
+
+        /* Virus alert modal */
+        .virus-alert {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border: 3px solid red;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+            z-index: 10002;
+            display: none;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        .virus-alert.active {
+            display: block;
+        }
+
+        .virus-alert h2 {
+            color: red;
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+
+        .virus-alert p {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 16px;
+            text-indent: 0;
+        }
+
+        .virus-alert button {
+            background: #2196F3;
+            color: white;
+            border: none;
+            padding: 10px 30px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .virus-alert button:hover {
+            background: #1976D2;
+        }
+
+        /* Thinking message */
+        .thinking-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 40px 60px;
+            border-radius: 12px;
+            font-size: 24px;
+            font-style: italic;
+            z-index: 10002;
+            display: none;
+            text-align: center;
+        }
+
+        .thinking-message.active {
+            display: block;
+        }
+
+        /* Tired prompt */
+        .tired-prompt {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 24px;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 20px 40px;
+            border-radius: 12px;
+            z-index: 6;
+            display: none;
+        }
+
+        /* Win screen */
+        .win-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 10003;
+            opacity: 0;
+            transition: opacity 2s;
+        }
+
+        .win-screen.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .win-content {
+            text-align: center;
+            color: white;
+        }
+
+        .win-content h1 {
+            font-size: 72px;
+            margin-bottom: 20px;
+            text-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .win-content p {
+            font-size: 32px;
+            margin-bottom: 40px;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Confetti */
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #f0f;
+            animation: confetti-fall 3s linear forwards;
+        }
+
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        /* Credits screen */
+        .credits-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: black;
+            display: none;
+            justify-content: center;
+            align-items: flex-end;
+            z-index: 10004;
+            overflow: hidden;
+        }
+
+        .credits-screen.active {
+            display: flex;
+        }
+
+        .credits-content {
+            color: white;
+            text-align: center;
+            font-size: 24px;
+            line-height: 2;
+            padding: 50px;
+            animation: rollCredits 20s linear forwards;
+            position: relative;
+            z-index: 10005;
+        }
+
+        @keyframes rollCredits {
+            0% {
+                transform: translateY(100vh);
+            }
+            100% {
+                transform: translateY(-100%);
+            }
+        }
+
+        .credits-content h2 {
+            font-size: 42px;
+            margin: 60px 0 30px 0;
+        }
+
+        .credits-content p {
+            margin: 10px 0;
+            font-size: 28px;
+        }
+
+        .credits-content .role {
+            color: #888;
+            font-size: 20px;
+        }
+
+        /* Credits character walking on left */
+        .credits-character {
+            position: absolute;
+            left: 5%;
+            bottom: 10%;
+            width: 55vh;
+            height: 55vh;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            z-index: 10006;
+        }
+
+        /* Credits images moving */
+        .credits-image {
+            position: absolute;
+            height: 150px;
+            width: auto;
+            right: -300px;
+            z-index: 1;
+            opacity: 0.3;
+        }
+
+        .credits-image.move {
+            animation: moveLeft 15s linear infinite;
+        }
+
+        @keyframes moveLeft {
+            0% {
+                right: -300px;
+            }
+            100% {
+                right: 100%;
+            }
+        }
+    </style>
+</head>
+<body class="starting-room-active">
+    <!-- Starting room -->
+    <div class="starting-room" id="starting-room"></div>
+
+    <!-- Dorm room -->
+    <div class="dorm-room" id="dorm-room"></div>
+
+    <!-- Heart message in dorm -->
+    <div class="heart-message" id="heart-message"></div>
+
+    <!-- Background layer - sky gradient -->
+    <div class="background city-scene"></div>
+
+    <!-- Midground - city skyline -->
+    <div class="midground city-scene" id="midground"></div>
+
+    <!-- Foreground - road -->
+    <div class="foreground city-scene" id="foreground"></div>
+
+    <!-- Sky effects - stars and clouds above everything -->
+    <div class="sky-effects city-scene" id="sky-effects">
+        <div class="stars"></div>
+        <div class="cloud cloud1"></div>
+        <div class="cloud cloud2"></div>
+        <div class="cloud cloud3"></div>
+    </div>
+
+    <!-- Player character -->
+    <div id="player"></div>
+
+    <div class="instructions" id="instructions">
+        Press <strong>A</strong> and <strong>D</strong> to move | <strong>E</strong> to interact
+    </div>
+
+    <!-- Smartphone -->
+    <div class="smartphone" id="smartphone">
+        <div class="notification-badge hidden" id="notification-badge">1</div>
+    </div>
+
+    <div class="phone-prompt" id="phone-prompt">
+        Press <strong>E</strong> to view messages
+    </div>
+
+    <div class="phone-overlay" id="phone-overlay"></div>
+
+    <div class="message-bubble" id="message-bubble">good luck on the test today! i love you most</div>
+    <div class="message-bubble-2" id="message-bubble-2">i know you did amazing, i left a gift for you at your dorm</div>
+
+    <div class="close-phone-prompt" id="close-phone-prompt">
+        Press <strong>E</strong> to put away phone
+    </div>
+
+    <div class="e-prompt" id="e-prompt">
+        Complete the test first!
+    </div>
+
+    <div class="city-e-prompt" id="city-e-prompt">
+        Press <strong>E</strong> to enter the dorm
+    </div>
+
+    <div class="middle-popup" id="middle-popup">
+        Press <strong>E</strong> to take the test
+    </div>
+
+    <div class="dorm-e-prompt" id="dorm-e-prompt">
+        Press <strong>E</strong> to open the letter
+    </div>
+
+    <div class="tired-prompt" id="tired-prompt">
+        You're tired. Press <strong>E</strong> to go to your room
+    </div>
+
+    <!-- Word Search modal -->
+    <div class="crossword-modal" id="crossword-modal" style="display: none;">
+        <div class="book-container" id="book-container">
+            <div class="book-cover" id="book-cover">
+                <div class="book-cover-text">MAD0726 Final Exam</div>
+            </div>
+            <div class="crossword-container" id="crossword-container" style="background: white; color: black;">
+            <h2 style="color: #333; font-size: 28px; margin-bottom: 20px;">MAD0726 Final Exam</h2>
+            <p style="text-align: center; color: #666; font-size: 16px;">Click and drag to select letters!</p>
+            <div class="crossword-grid" id="crossword-grid" style="background: #e0e0e0; min-height: 200px; width: 100%;">
+                <p style="color: red; font-size: 20px; padding: 20px;">GRID WILL LOAD HERE</p>
+            </div>
+            <div class="word-list">
+                <h3 style="color: #333;">Find these words:</h3>
+                <div class="words-to-find" id="words-to-find">
+                    <p style="color: #333;">Words will appear here...</p>
+                </div>
+            </div>
+                <button class="close-modal" id="close-modal">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fade overlay -->
+    <div class="fade-overlay" id="fade-overlay"></div>
+
+    <!-- Letter modal -->
+    <div class="letter-modal" id="letter-modal">
+        <div class="envelope-container">
+            <div class="envelope-wrapper" id="envelope-wrapper">
+                <div class="envelope-front">
+                    <div class="to-line">To: Maddie Wild</div>
+                    <div class="from-line">From: Your Love</div>
+                </div>
+                <div class="envelope">
+                    <div class="heart-seal-bottom" id="heart-seal-bottom"></div>
+                    <div class="envelope-flap" id="envelope-flap">
+                        <div class="heart-seal-top" id="heart-seal-top"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="letter" id="letter">
+                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+                <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.</p>
+                <p>With love,<br>Your Secret Admirer</p>
+
+                <div class="letter-question">Will you be my valentine?</div>
+                <div class="letter-buttons">
+                    <button class="valentine-btn valentine-yes" id="valentine-yes">Yes</button>
+                    <button class="valentine-btn valentine-no" id="valentine-no">No</button>
+                </div>
+            </div>
+        </div>
+        <button class="close-letter" id="close-letter">Close</button>
+    </div>
+
+    <!-- Virus alert modal -->
+    <div class="virus-alert" id="virus-alert">
+        <h2>⚠️ WARNING ⚠️</h2>
+        <p>CRITICAL SYSTEM ERROR: Malicious activity detected. Your system has been compromised and will be infected with a virus if you proceed with this action.</p>
+        <p><strong>Error Code: 0x80070057</strong></p>
+        <p>Please reconsider your choice to prevent permanent damage to your device.</p>
+        <button id="close-virus-alert">OK</button>
+    </div>
+
+    <!-- Thinking message -->
+    <div class="thinking-message" id="thinking-message">
+        He will like that.
+    </div>
+
+    <!-- Win screen -->
+    <div class="win-screen" id="win-screen">
+        <div class="win-content">
+            <h1>🎉 Congratulations! 🎉</h1>
+            <p>You found your valentine!</p>
+        </div>
+        <div id="confetti-container"></div>
+    </div>
+
+    <!-- Credits screen -->
+    <div class="credits-screen" id="credits-screen">
+        <div class="credits-character" id="credits-character"></div>
+        <div class="credits-content">
+            <h2>Valentine's Day 2026</h2>
+
+            <p class="role">Game Design</p>
+            <p>Jeffrey Ma</p>
+
+            <p class="role">Programming</p>
+            <p>Claude Sonnet 4.5</p>
+
+            <p class="role">Art & Graphics</p>
+            <p>Jeffrey Ma</p>
+
+            <p class="role">Special Thanks</p>
+            <p>Maddie</p>
+
+            <h2>🎮 THE END 🎮</h2>
+
+            <p style="margin-top: 100px;">Made with ❤️ for Valentine's Day</p>
+        </div>
+    </div>
+
+    <script>
+        const player = document.getElementById('player');
+        const foreground = document.getElementById('foreground');
+        const midground = document.getElementById('midground');
+        const stars = document.querySelector('.stars');
+        const clouds = document.querySelectorAll('.cloud');
+        const startingRoom = document.getElementById('starting-room');
+        const dormRoom = document.getElementById('dorm-room');
+        const heartMessage = document.getElementById('heart-message');
+        const skyEffects = document.getElementById('sky-effects');
+        const instructions = document.getElementById('instructions');
+        const ePrompt = document.getElementById('e-prompt');
+        const cityEPrompt = document.getElementById('city-e-prompt');
+        const middlePopup = document.getElementById('middle-popup');
+        const fadeOverlay = document.getElementById('fade-overlay');
+        const crosswordModal = document.getElementById('crossword-modal');
+        const bookCover = document.getElementById('book-cover');
+        const closeModalBtn = document.getElementById('close-modal');
+        const dormEPrompt = document.getElementById('dorm-e-prompt');
+        const letterModal = document.getElementById('letter-modal');
+        const letter = document.getElementById('letter');
+        const closeLetterBtn = document.getElementById('close-letter');
+        const valentineYesBtn = document.getElementById('valentine-yes');
+        const valentineNoBtn = document.getElementById('valentine-no');
+        const virusAlert = document.getElementById('virus-alert');
+        const closeVirusAlertBtn = document.getElementById('close-virus-alert');
+        const thinkingMessage = document.getElementById('thinking-message');
+        const envelopeWrapper = document.getElementById('envelope-wrapper');
+        const envelopeFlap = document.getElementById('envelope-flap');
+        const heartSealTop = document.getElementById('heart-seal-top');
+        const heartSealBottom = document.getElementById('heart-seal-bottom');
+        const tiredPrompt = document.getElementById('tired-prompt');
+        const winScreen = document.getElementById('win-screen');
+        const creditsScreen = document.getElementById('credits-screen');
+        const confettiContainer = document.getElementById('confetti-container');
+        const creditsCharacter = document.getElementById('credits-character');
+        const smartphone = document.getElementById('smartphone');
+        const notificationBadge = document.getElementById('notification-badge');
+        const phonePrompt = document.getElementById('phone-prompt');
+        const phoneOverlay = document.getElementById('phone-overlay');
+        const messageBubble = document.getElementById('message-bubble');
+        const messageBubble2 = document.getElementById('message-bubble-2');
+        const closePhonePrompt = document.getElementById('close-phone-prompt');
+
+        // Word search data
+        const wordsToFind = ['MOOK', 'WOOK', 'SHORTCAKE', 'HONORS', 'ITALY'];
+        let foundWords = [];
+        let wordSearchGrid = [];
+        let selectedCells = [];
+        let isSelecting = false;
+        let testCompleted = false;
+
+        // Game state
+        let gameState = 'starting-room'; // 'starting-room', 'city', 'dorm-room'
+        let playerPosition = 0; // Player position in starting room
+        let worldPosition = 0; // Will be set when entering city
+        const speed = 5;
+        const cityParallaxSpeed = 0.05;
+        let cityWidth = 0; // Will be calculated dynamically based on images
+        let cityImagesLoaded = false;
+
+        // Build city skyline from separate images
+        function buildCitySkyline() {
+            return new Promise((resolve) => {
+                console.log('Building city skyline...');
+                const midgroundContainer = document.getElementById('midground');
+                const containerHeight = window.innerHeight * 0.7; // 70vh
+
+                // Load images
+                const beforeImg = new Image();
+                const skylineImg = new Image();
+                const afterImg = new Image();
+
+                let loadedCount = 0;
+                const checkAllLoaded = () => {
+                    loadedCount++;
+                    console.log(`Image ${loadedCount}/3 loaded`);
+                    if (loadedCount === 3) {
+                        buildSegments();
+                    }
+                };
+
+                beforeImg.onload = checkAllLoaded;
+                skylineImg.onload = checkAllLoaded;
+                afterImg.onload = checkAllLoaded;
+
+                beforeImg.onerror = () => console.error('Failed to load seoul_before_temple.png');
+                skylineImg.onerror = () => console.error('Failed to load skyline_only.png');
+                afterImg.onerror = () => console.error('Failed to load seoul_after_temple.png');
+
+                beforeImg.src = 'seoul_before_temple.png';
+                skylineImg.src = 'skyline_only.png';
+                afterImg.src = 'seoul_after_temple.png';
+
+                function buildSegments() {
+                    // Calculate widths based on aspect ratios
+                    const beforeWidth = (beforeImg.width / beforeImg.height) * containerHeight;
+                    const skylineWidth = (skylineImg.width / skylineImg.height) * containerHeight;
+                    const afterWidth = (afterImg.width / afterImg.height) * containerHeight;
+
+                    console.log('Image dimensions:', {
+                        before: `${beforeImg.width}x${beforeImg.height} -> ${beforeWidth}px`,
+                        skyline: `${skylineImg.width}x${skylineImg.height} -> ${skylineWidth}px`,
+                        after: `${afterImg.width}x${afterImg.height} -> ${afterWidth}px`
+                    });
+
+                    // Calculate how many skyline_only images we need
+                    const screenWidth = window.innerWidth;
+                    // Just use 1 skyline_only image between before and after
+                    const skylineCount = 1;
+
+                    // Clear existing content
+                    midgroundContainer.innerHTML = '';
+
+                    // Add before temple
+                    const beforeSegment = document.createElement('div');
+                    beforeSegment.className = 'city-segment';
+                    beforeSegment.style.width = beforeWidth + 'px';
+                    beforeSegment.style.backgroundImage = "url('seoul_before_temple.png')";
+                    midgroundContainer.appendChild(beforeSegment);
+
+                    // Add skyline segments
+                    for (let i = 0; i < skylineCount; i++) {
+                        const skylineSegment = document.createElement('div');
+                        skylineSegment.className = 'city-segment';
+                        skylineSegment.style.width = skylineWidth + 'px';
+                        skylineSegment.style.backgroundImage = "url('skyline_only.png')";
+                        midgroundContainer.appendChild(skylineSegment);
+                    }
+
+                    // Add after temple
+                    const afterSegment = document.createElement('div');
+                    afterSegment.className = 'city-segment';
+                    afterSegment.style.width = afterWidth + 'px';
+                    afterSegment.style.backgroundImage = "url('seoul_after_temple.png')";
+                    midgroundContainer.appendChild(afterSegment);
+
+                    // Calculate total city width
+                    cityWidth = beforeWidth + (skylineWidth * skylineCount) + afterWidth;
+                    cityImagesLoaded = true;
+
+                    console.log('City built successfully:', {
+                        beforeWidth,
+                        skylineWidth,
+                        skylineCount,
+                        afterWidth,
+                        totalWidth: cityWidth,
+                        segments: midgroundContainer.children.length
+                    });
+
+                    resolve();
+                }
+            });
+        }
+
+        // Calculate dynamic road width based on city and screen
+        function calculateCityBoundaries() {
+            const screenWidth = window.innerWidth;
+
+            // Calculate the world position where city right edge reaches screen right edge
+            // City position = worldPosition * cityParallaxSpeed
+            // City right edge = cityPosition + cityWidth
+            // When city right edge = screenWidth: worldPosition * cityParallaxSpeed + cityWidth = screenWidth
+            const cityRightEdgeLimit = (screenWidth - cityWidth) / cityParallaxSpeed;
+
+            // Start in the middle of the city so road beginning isn't visible
+            const initialWorldPosition = -screenWidth * 0.5;
+
+            // Calculate road width needed - add extra buffer to ensure we don't run out
+            const scrollRange = Math.abs(cityRightEdgeLimit - initialWorldPosition);
+            const roadWidth = scrollRange + screenWidth * 2;
+
+            // Set road width
+            foreground.style.width = roadWidth + 'px';
+
+            // Calculate boundaries
+            // Left boundary: allow some movement left but not to see road start
+            const minWorldPosition = -screenWidth * 0.3;
+
+            // Right boundary: stop before city right edge becomes visible
+            const maxWorldPosition = cityRightEdgeLimit;
+
+            return {
+                minWorldPosition,
+                maxWorldPosition,
+                initialWorldPosition
+            };
+        }
+
+        // Track pressed keys
+        const keys = {};
+        let isMoving = false;
+        let facingLeft = false;
+        let walkFrame = 0; // Track animation frame
+        let frameCounter = 0; // Counter to control animation speed
+        let middlePopupTimer = null;
+        let inMiddleArea = false;
+        let letterOpened = false; // Track if player has agreed to be valentine
+        let shouldGoToRoom = false; // Track if player should go to their room
+        let phoneOpen = false; // Track if phone is currently open
+        let phoneMessageSeen = false; // Track if starting room notification has been seen
+        let cityPhoneMessageSeen = false; // Track if city notification has been seen
+        let previousGameState = 'starting-room'; // Track state before opening phone
+        let phoneVibratedInStartingRoom = false; // Track if phone vibrated in starting room
+        let phoneVibratedInCity = false; // Track if phone vibrated in city
+
+        document.addEventListener('keydown', (e) => {
+            const key = e.key.toLowerCase();
+            keys[key] = true;
+
+            // Handle E key press
+            if (key === 'e' && gameState === 'phone') {
+                closePhone();
+            } else if (key === 'e' && gameState === 'starting-room') {
+                // Check if phone is open
+                if (phoneOpen) {
+                    closePhone();
+                }
+                // Check if player wants to open phone
+                else if (!phoneMessageSeen && !testCompleted) {
+                    openPhone();
+                }
+                // Check if player is in the middle (test area) - only after viewing phone message and before completing test
+                else if (Math.abs(playerPosition) < 50 && phoneMessageSeen && !testCompleted) {
+                    openCrosswordModal();
+                }
+                // Check if player is on the right side (door area)
+                else if (playerPosition < -300) {
+                    if (testCompleted) {
+                        transitionToCity();
+                    } else {
+                        alert('You must complete the word search test before leaving!');
+                    }
+                }
+            } else if (key === 'e' && gameState === 'city') {
+                // Check if player wants to open phone
+                if (!cityPhoneMessageSeen) {
+                    openPhone();
+                } else {
+                    // Check if player is at the right end of the road
+                    const screenWidth = window.innerWidth;
+                    const boundaries = calculateCityBoundaries();
+                    const citySkylineLimit = (screenWidth - cityWidth) / cityParallaxSpeed;
+                    const maxWorldPosition = Math.max(citySkylineLimit, boundaries.maxWorldPosition);
+
+                    // Check if player is near the right boundary (only allow if message seen)
+                    if (worldPosition <= maxWorldPosition + 50 && cityPhoneMessageSeen) {
+                        transitionToDorm();
+                    }
+                }
+            } else if (key === 'e' && gameState === 'dorm-room') {
+                // Check if player should go to their room (after accepting valentine)
+                if (shouldGoToRoom) {
+                    showWinScreen();
+                }
+                // Check if player is near the heart (left side of room) and hasn't opened letter yet
+                else if (playerPosition > 150 && playerPosition < 350 && !letterOpened) {
+                    openLetterModal();
+                }
+            }
+        });
+
+        // Generate random letter
+        function randomLetter() {
+            const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            return letters[Math.floor(Math.random() * letters.length)];
+        }
+
+        // Generate word search grid
+        function generateWordSearchGrid() {
+            // Initialize 10x10 grid with random letters
+            wordSearchGrid = [];
+            for (let i = 0; i < 10; i++) {
+                wordSearchGrid[i] = [];
+                for (let j = 0; j < 10; j++) {
+                    wordSearchGrid[i][j] = randomLetter();
+                }
+            }
+
+            // Place words in the grid (within 10x10 bounds: rows/cols 0-9)
+            // MOOK - horizontal at row 1, starting at col 1
+            'MOOK'.split('').forEach((letter, i) => {
+                wordSearchGrid[1][1 + i] = letter;
+            });
+
+            // WOOK - vertical at col 7, starting at row 0
+            'WOOK'.split('').forEach((letter, i) => {
+                wordSearchGrid[0 + i][7] = letter;
+            });
+
+            // SHORTCAKE - horizontal at row 8, starting at col 0
+            'SHORTCAKE'.split('').forEach((letter, i) => {
+                wordSearchGrid[8][0 + i] = letter;
+            });
+
+            // HONORS - horizontal at row 4, starting at col 3
+            'HONORS'.split('').forEach((letter, i) => {
+                wordSearchGrid[4][3 + i] = letter;
+            });
+
+            // ITALY - vertical at col 9, starting at row 2
+            'ITALY'.split('').forEach((letter, i) => {
+                wordSearchGrid[2 + i][9] = letter;
+            });
+
+            // Render grid
+            const gridElement = document.getElementById('crossword-grid');
+            console.log('Grid element:', gridElement);
+            gridElement.innerHTML = '';
+
+            for (let row = 0; row < 10; row++) {
+                for (let col = 0; col < 10; col++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'crossword-cell';
+                    cell.textContent = wordSearchGrid[row][col];
+                    cell.dataset.row = row;
+                    cell.dataset.col = col;
+
+                    // Add mouse events for selection
+                    cell.addEventListener('mousedown', startSelection);
+                    cell.addEventListener('mouseenter', continueSelection);
+                    cell.addEventListener('mouseup', endSelection);
+
+                    gridElement.appendChild(cell);
+                }
+            }
+            console.log('Created', gridElement.children.length, 'cells');
+
+            // Generate word list
+            const wordListElement = document.getElementById('words-to-find');
+            wordListElement.innerHTML = '';
+            wordsToFind.forEach(word => {
+                const wordItem = document.createElement('div');
+                wordItem.className = 'word-item';
+                wordItem.textContent = word;
+                wordItem.dataset.word = word;
+                wordListElement.appendChild(wordItem);
+            });
+
+            foundWords = [];
+        }
+
+        // Selection handlers
+        let selectionDirection = null; // 'horizontal' or 'vertical'
+
+        function startSelection(e) {
+            isSelecting = true;
+            selectedCells = [e.target];
+            e.target.classList.add('selected');
+            selectionDirection = null;
+        }
+
+        function continueSelection(e) {
+            if (!isSelecting) return;
+            if (selectedCells.includes(e.target)) return;
+
+            const firstCell = selectedCells[0];
+            const firstRow = parseInt(firstCell.dataset.row);
+            const firstCol = parseInt(firstCell.dataset.col);
+            const currentRow = parseInt(e.target.dataset.row);
+            const currentCol = parseInt(e.target.dataset.col);
+
+            // Only allow horizontal or vertical selection
+            const rowDiff = currentRow - firstRow;
+            const colDiff = currentCol - firstCol;
+
+            let currentDirection = null;
+            if (rowDiff === 0 && colDiff !== 0) {
+                currentDirection = 'horizontal';
+            } else if (colDiff === 0 && rowDiff !== 0) {
+                currentDirection = 'vertical';
+            } else {
+                return; // Not horizontal or vertical
+            }
+
+            // If this is the second cell, set the direction
+            if (selectedCells.length === 1) {
+                selectionDirection = currentDirection;
+                selectedCells.push(e.target);
+                e.target.classList.add('selected');
+                return;
+            }
+
+            // Check if current cell maintains the same direction
+            if (currentDirection === selectionDirection) {
+                selectedCells.push(e.target);
+                e.target.classList.add('selected');
+            }
+        }
+
+        function endSelection() {
+            if (!isSelecting) return;
+            isSelecting = false;
+
+            // Check if selected cells form a valid word
+            const selectedWord = selectedCells.map(cell => cell.textContent).join('');
+            const reversedWord = selectedWord.split('').reverse().join('');
+
+            if (wordsToFind.includes(selectedWord) && !foundWords.includes(selectedWord)) {
+                foundWords.push(selectedWord);
+                markWordAsFound(selectedWord);
+            } else if (wordsToFind.includes(reversedWord) && !foundWords.includes(reversedWord)) {
+                foundWords.push(reversedWord);
+                markWordAsFound(reversedWord);
+            } else {
+                // Clear selection if not a valid word
+                selectedCells.forEach(cell => cell.classList.remove('selected'));
+            }
+
+            selectedCells = [];
+
+            // Check if all words found
+            if (foundWords.length === wordsToFind.length) {
+                setTimeout(() => {
+                    alert('Congratulations! You found all the words! You can now exit through the door. 🎉');
+                    testCompleted = true;
+                }, 300);
+            }
+        }
+
+        function markWordAsFound(word) {
+            // Mark cells as found
+            selectedCells.forEach(cell => {
+                cell.classList.remove('selected');
+                cell.classList.add('found');
+            });
+
+            // Mark word in list
+            const wordItem = document.querySelector(`.word-item[data-word="${word}"]`);
+            if (wordItem) {
+                wordItem.classList.add('found');
+            }
+        }
+
+        // Open word search modal
+        function openCrosswordModal() {
+            console.log('Opening word search modal');
+            console.log('Modal element:', crosswordModal);
+
+            // Generate grid first
+            generateWordSearchGrid();
+
+            // Reset book animation
+            bookCover.classList.remove('open');
+
+            // Show modal
+            crosswordModal.style.display = 'flex';
+            crosswordModal.classList.add('active');
+
+            console.log('Modal display:', crosswordModal.style.display);
+            console.log('Modal classList:', crosswordModal.classList);
+            console.log('Grid cells created:', document.querySelectorAll('.crossword-cell').length);
+
+            // After a short delay, open the book
+            setTimeout(() => {
+                bookCover.classList.add('open');
+            }, 500);
+
+            gameState = 'crossword';
+        }
+
+        // Close word search modal
+        function closeCrosswordModal() {
+            crosswordModal.style.display = 'none';
+            crosswordModal.classList.remove('active');
+            bookCover.classList.remove('open');
+            gameState = 'starting-room';
+        }
+
+        closeModalBtn.addEventListener('click', closeCrosswordModal);
+
+        // Phone vibration and notification
+        function vibratePhone() {
+            smartphone.classList.add('vibrate');
+
+            // Remove vibrate class after animation completes
+            setTimeout(() => {
+                smartphone.classList.remove('vibrate');
+            }, 300); // 0.15s * 2 = 0.3s
+        }
+
+        function showStartingRoomNotification() {
+            if (!phoneVibratedInStartingRoom && !phoneMessageSeen && !testCompleted && gameState === 'starting-room') {
+                setTimeout(() => {
+                    if (gameState === 'starting-room' && !phoneMessageSeen && !testCompleted) {
+                        vibratePhone();
+
+                        // Show notification badge and prompt after vibration
+                        setTimeout(() => {
+                            notificationBadge.classList.remove('hidden');
+                            phonePrompt.style.display = 'block';
+                            phoneVibratedInStartingRoom = true;
+                        }, 700);
+                    }
+                }, 2000); // Wait 2 seconds after game starts
+            }
+        }
+
+        function showCityNotification() {
+            if (!phoneVibratedInCity && !cityPhoneMessageSeen && gameState === 'city') {
+                setTimeout(() => {
+                    if (gameState === 'city' && !cityPhoneMessageSeen) {
+                        vibratePhone();
+
+                        // Show notification badge and prompt after vibration
+                        setTimeout(() => {
+                            notificationBadge.classList.remove('hidden');
+                            phonePrompt.style.display = 'block';
+                            phoneVibratedInCity = true;
+                        }, 700);
+                    }
+                }, 2000); // Wait 2 seconds after entering city
+            }
+        }
+
+        // Click on smartphone to open
+        smartphone.addEventListener('click', () => {
+            if (!phoneOpen && (gameState === 'starting-room' || gameState === 'city' || gameState === 'dorm-room')) {
+                // Starting room: show notification before test
+                if (gameState === 'starting-room' && !phoneMessageSeen && !testCompleted) {
+                    openPhone();
+                }
+                // City: show notification after completing test
+                else if (gameState === 'city' && !cityPhoneMessageSeen) {
+                    openPhone();
+                }
+            }
+        });
+
+        // Phone functions
+        function openPhone() {
+            phoneOpen = true;
+
+            // Store previous game state
+            previousGameState = gameState;
+
+            // Show overlay
+            phoneOverlay.classList.add('active');
+
+            // Enlarge phone (changes to smartphone_with_contact.png)
+            smartphone.classList.add('enlarged');
+
+            // Hide notification badge and phone prompt
+            notificationBadge.classList.add('hidden');
+            phonePrompt.style.display = 'none';
+
+            // Show appropriate message(s) based on game state
+            setTimeout(() => {
+                if (previousGameState === 'starting-room') {
+                    phoneMessageSeen = true;
+                    messageBubble.classList.add('active');
+                } else if (previousGameState === 'city') {
+                    cityPhoneMessageSeen = true;
+                    messageBubble.classList.add('active');
+                    messageBubble2.classList.add('active');
+                }
+            }, 500);
+
+            // Show close prompt
+            closePhonePrompt.style.display = 'block';
+
+            // Pause game
+            gameState = 'phone';
+        }
+
+        function closePhone() {
+            phoneOpen = false;
+
+            // Hide message bubbles
+            messageBubble.classList.remove('active');
+            messageBubble2.classList.remove('active');
+
+            // Hide close prompt
+            closePhonePrompt.style.display = 'none';
+
+            // Shrink phone (changes back to smartphone.png)
+            smartphone.classList.remove('enlarged');
+
+            // Hide overlay after animation
+            setTimeout(() => {
+                phoneOverlay.classList.remove('active');
+            }, 500);
+
+            // Resume game - return to previous state
+            gameState = previousGameState;
+        }
+
+        // Open letter modal
+        function openLetterModal() {
+            console.log('Opening letter modal');
+            letterModal.classList.add('active');
+
+            // Reset all animations
+            letter.classList.remove('slide-out');
+            envelopeFlap.classList.remove('open');
+            envelopeWrapper.classList.remove('flipped');
+
+            // Step 1: Show front for 1.5 seconds, then flip
+            setTimeout(() => {
+                envelopeWrapper.classList.add('flipped');
+            }, 1500);
+
+            // Step 2: Open envelope flap after flip completes (1.5s + 2s flip + 0.5s pause = 4s)
+            setTimeout(() => {
+                envelopeFlap.classList.add('open');
+            }, 4000);
+
+            // Step 3: Slide letter out after flap opens (4s + 1s = 5s)
+            setTimeout(() => {
+                letter.classList.add('slide-out');
+            }, 5000);
+
+            gameState = 'letter';
+        }
+
+        // Close letter modal
+        function closeLetterModal() {
+            letterModal.classList.remove('active');
+            letter.classList.remove('slide-out');
+            envelopeFlap.classList.remove('open');
+            envelopeWrapper.classList.remove('flipped');
+            gameState = 'dorm-room';
+        }
+
+        closeLetterBtn.addEventListener('click', closeLetterModal);
+
+        // Valentine Yes button
+        valentineYesBtn.addEventListener('click', () => {
+            console.log('Player said Yes!');
+
+            // Mark letter as opened
+            letterOpened = true;
+
+            // Close the letter modal and reset animations
+            letterModal.classList.remove('active');
+            letter.classList.remove('slide-out');
+            envelopeFlap.classList.remove('open');
+            envelopeWrapper.classList.remove('flipped');
+
+            // Hide the heart message permanently
+            heartMessage.style.display = 'none';
+
+            // Show thinking message
+            thinkingMessage.classList.add('active');
+
+            // Hide thinking message after 3 seconds and show tired prompt
+            setTimeout(() => {
+                thinkingMessage.classList.remove('active');
+                shouldGoToRoom = true;
+                gameState = 'dorm-room';
+            }, 3000);
+        });
+
+        // Valentine No button
+        valentineNoBtn.addEventListener('click', () => {
+            console.log('Player said No - showing virus alert');
+            virusAlert.classList.add('active');
+        });
+
+        // Close virus alert
+        closeVirusAlertBtn.addEventListener('click', () => {
+            virusAlert.classList.remove('active');
+            // Letter stays open, player must choose again
+        });
+
+        // Create confetti explosion
+        function createConfetti() {
+            const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#ffa500', '#ff1493'];
+
+            for (let i = 0; i < 150; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + '%';
+                    confetti.style.top = Math.random() * 20 + '%';
+                    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.width = (Math.random() * 10 + 5) + 'px';
+                    confetti.style.height = (Math.random() * 10 + 5) + 'px';
+                    confetti.style.animationDelay = Math.random() * 0.5 + 's';
+                    confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+
+                    confettiContainer.appendChild(confetti);
+
+                    // Remove confetti after animation
+                    setTimeout(() => {
+                        confetti.remove();
+                    }, 5000);
+                }, i * 10);
+            }
+        }
+
+        // Show win screen
+        function showWinScreen() {
+            gameState = 'win';
+
+            // Fade to black first
+            fadeOverlay.classList.add('active');
+
+            setTimeout(() => {
+                // Hide dorm room, player, instructions, and phone
+                dormRoom.style.display = 'none';
+                player.style.display = 'none';
+                instructions.style.display = 'none';
+                tiredPrompt.style.display = 'none';
+                smartphone.style.display = 'none';
+
+                // Show win screen
+                winScreen.classList.add('active');
+
+                // Fade in win screen
+                fadeOverlay.classList.remove('active');
+
+                // Create confetti explosion
+                createConfetti();
+
+                // Show credits after 4 seconds
+                setTimeout(() => {
+                    showCredits();
+                }, 4000);
+            }, 2000);
+        }
+
+        // Animate credits character
+        let creditsWalkFrame = 0;
+        let creditsFrameCounter = 0;
+        let creditsAnimationInterval = null;
+
+        function animateCreditsCharacter() {
+            creditsAnimationInterval = setInterval(() => {
+                creditsFrameCounter++;
+
+                if (creditsFrameCounter >= 2) {
+                    creditsFrameCounter = 0;
+                    creditsWalkFrame = (creditsWalkFrame + 1) % 3;
+                }
+
+                if (creditsWalkFrame === 0) {
+                    creditsCharacter.style.backgroundImage = "url('maddie_move.png')";
+                } else if (creditsWalkFrame === 1) {
+                    creditsCharacter.style.backgroundImage = "url('maddie_stride.png')";
+                } else {
+                    creditsCharacter.style.backgroundImage = "url('maddie_still.png')";
+                }
+            }, 100);
+        }
+
+        // Create moving images in credits from credits_images folder
+        function createMovingImages() {
+            // List of images to load from the credits_images folder
+            // User should create a folder called "credits_images" and place images there
+            const imageFiles = [
+                'image1.jpg',
+                'image2.jpg',
+                'image3.jpg',
+                'image4.jpg',
+                'image5.jpg',
+                'image6.jpg',
+                'image7.jpg',
+                'image8.jpg',
+                'image9.jpg',
+                'image10.jpg'
+            ];
+
+            let imageIndex = 0;
+
+            setInterval(() => {
+                const img = document.createElement('img');
+                img.src = 'credits_images/' + imageFiles[imageIndex % imageFiles.length];
+                img.className = 'credits-image move';
+                img.style.top = (Math.random() * 70 + 10) + '%';
+                img.style.height = (Math.random() * 100 + 100) + 'px';
+
+                // Handle image load errors gracefully
+                img.onerror = () => {
+                    console.log('Could not load image:', img.src);
+                    img.remove();
+                };
+
+                creditsScreen.appendChild(img);
+
+                // Remove image after animation completes
+                setTimeout(() => {
+                    img.remove();
+                }, 15000);
+
+                imageIndex++;
+            }, 3000);
+        }
+
+        // Show credits
+        function showCredits() {
+            gameState = 'credits';
+
+            // Fade to black
+            fadeOverlay.classList.add('active');
+
+            setTimeout(() => {
+                // Hide win screen
+                winScreen.classList.remove('active');
+
+                // Show credits
+                creditsScreen.classList.add('active');
+
+                // Fade in credits
+                fadeOverlay.classList.remove('active');
+
+                // Start credits character animation
+                animateCreditsCharacter();
+
+                // Start moving images
+                createMovingImages();
+            }, 2000);
+        }
+
+        // Prevent text selection while dragging
+        document.addEventListener('mouseup', () => {
+            isSelecting = false;
+        });
+
+        // Recalculate road width on window resize
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            if (gameState === 'city') {
+                // Debounce resize events
+                clearTimeout(resizeTimeout);
+                resizeTimeout = setTimeout(async () => {
+                    await buildCitySkyline();
+                    calculateCityBoundaries();
+                }, 250);
+            }
+        });
+
+        document.addEventListener('keyup', (e) => {
+            keys[e.key.toLowerCase()] = false;
+        });
+
+        // Transition from starting room to city
+        async function transitionToCity() {
+            gameState = 'transitioning';
+
+            // Fade to black
+            fadeOverlay.classList.add('active');
+
+            setTimeout(async () => {
+                // Build city skyline if not already loaded
+                if (!cityImagesLoaded) {
+                    await buildCitySkyline();
+                }
+
+                // Hide starting room elements
+                startingRoom.style.display = 'none';
+                ePrompt.style.display = 'none';
+                middlePopup.style.display = 'none';
+                phonePrompt.style.display = 'none';
+
+                // Remove starting room class (resizes player)
+                document.body.classList.remove('starting-room-active');
+
+                // Show city elements
+                document.querySelectorAll('.city-scene').forEach(el => {
+                    // Midground needs display: flex, others need block
+                    if (el.id === 'midground') {
+                        el.style.display = 'flex';
+                    } else {
+                        el.style.display = 'block';
+                    }
+                });
+
+                // Calculate boundaries and set up the city scene
+                const boundaries = calculateCityBoundaries();
+
+                // Update instructions
+                instructions.innerHTML = 'Press <strong>A</strong> and <strong>D</strong> to move | <strong>E</strong> to interact';
+
+                // Reset player position to center and set initial world position
+                playerPosition = 0;
+                player.style.left = '50%';
+                worldPosition = boundaries.initialWorldPosition;
+
+                setTimeout(() => {
+                    // Fade in
+                    fadeOverlay.classList.remove('active');
+                    gameState = 'city';
+                }, 500);
+
+                // Show city notification after fade completes
+                setTimeout(() => {
+                    showCityNotification();
+                }, 1000);
+            }, 2000);
+        }
+
+        // Transition from city to dorm
+        function transitionToDorm() {
+            gameState = 'transitioning';
+
+            // Fade to black
+            fadeOverlay.classList.add('active');
+
+            setTimeout(() => {
+                // Hide city elements
+                document.querySelectorAll('.city-scene').forEach(el => {
+                    el.style.display = 'none';
+                });
+                cityEPrompt.style.display = 'none';
+                dormEPrompt.style.display = 'none';
+                phonePrompt.style.display = 'none';
+
+                // Show dorm room and heart message
+                dormRoom.style.display = 'block';
+                heartMessage.style.display = 'block';
+
+                // Add dorm room class (resizes player)
+                document.body.classList.add('dorm-room-active');
+
+                // Update instructions
+                instructions.innerHTML = 'Press <strong>A</strong> and <strong>D</strong> to move | <strong>E</strong> to interact';
+
+                // Reset player position
+                playerPosition = 0;
+                player.style.left = '50%';
+
+                setTimeout(() => {
+                    // Fade in
+                    fadeOverlay.classList.remove('active');
+                    gameState = 'dorm-room';
+                }, 500);
+            }, 2000);
+        }
+
+        // Game loop
+        function update() {
+            let moving = false;
+
+            // Don't update if in crossword, letter, phone, win, or credits mode
+            if (gameState === 'crossword' || gameState === 'letter' || gameState === 'phone' || gameState === 'win' || gameState === 'credits') {
+                requestAnimationFrame(update);
+                return;
+            }
+
+            // Manage phone visibility
+            if (gameState === 'starting-room' || gameState === 'city' || gameState === 'dorm-room') {
+                smartphone.style.display = 'block';
+
+                // Hide notification badge when messages are seen
+                if ((gameState === 'starting-room' && phoneMessageSeen) ||
+                    (gameState === 'city' && cityPhoneMessageSeen)) {
+                    notificationBadge.classList.add('hidden');
+                }
+
+                // Don't override phone prompt if it's already shown by vibration notification
+                // Only hide it if conditions are no longer met
+                if (gameState === 'starting-room' && (phoneMessageSeen || testCompleted)) {
+                    phonePrompt.style.display = 'none';
+                } else if (gameState === 'city' && cityPhoneMessageSeen) {
+                    phonePrompt.style.display = 'none';
+                } else if (gameState === 'dorm-room') {
+                    phonePrompt.style.display = 'none';
+                }
+            } else if (gameState === 'transitioning') {
+                smartphone.style.display = 'none';
+                phonePrompt.style.display = 'none';
+            }
+
+            if (gameState === 'starting-room') {
+                // Starting room movement (limited to prevent seeing background edges)
+                if (keys['a'] && playerPosition < 350) {
+                    playerPosition += speed;
+                    moving = true;
+                    facingLeft = true;
+                }
+                if (keys['d'] && playerPosition > -350) {
+                    playerPosition -= speed;
+                    moving = true;
+                    facingLeft = false;
+                }
+
+                // Show E prompt when near the door (right side)
+                if (playerPosition < -300) {
+                    if (testCompleted) {
+                        ePrompt.textContent = 'Press E to enter';
+                    } else {
+                        ePrompt.innerHTML = 'Complete the test first!';
+                    }
+                    ePrompt.style.display = 'block';
+                } else {
+                    ePrompt.style.display = 'none';
+                }
+
+                // Show middle popup when in the center (only after viewing phone message and before completing test)
+                if (Math.abs(playerPosition) < 50 && phoneMessageSeen && !testCompleted) {
+                    middlePopup.style.display = 'block';
+                    inMiddleArea = true;
+                } else {
+                    middlePopup.style.display = 'none';
+                    inMiddleArea = false;
+                }
+
+                // Move player in starting room
+                player.style.left = `calc(50% + ${-playerPosition}px)`;
+
+            } else if (gameState === 'city') {
+                // City movement with dynamic boundaries
+                const boundaries = calculateCityBoundaries();
+                const screenWidth = window.innerWidth;
+
+                // Stop before city skyline right edge becomes visible
+                const citySkylineLimit = (screenWidth - cityWidth) / cityParallaxSpeed;
+
+                // Use the most restrictive limit (whichever stops scrolling first)
+                const maxWorldPosition = Math.max(citySkylineLimit, boundaries.maxWorldPosition);
+
+                if (keys['a'] && worldPosition < boundaries.minWorldPosition) {
+                    worldPosition += speed;
+                    moving = true;
+                    facingLeft = true;
+                }
+                if (keys['d'] && worldPosition > maxWorldPosition) {
+                    worldPosition -= speed;
+                    moving = true;
+                    facingLeft = false;
+                }
+
+                // Show E prompt when near the right end (only if city message seen)
+                if (worldPosition <= maxWorldPosition + 50 && cityPhoneMessageSeen) {
+                    cityEPrompt.style.display = 'block';
+                } else {
+                    cityEPrompt.style.display = 'none';
+                }
+
+                // Apply parallax effect with different speeds
+                foreground.style.transform = `translateX(${worldPosition}px)`;
+                midground.style.transform = `translateX(${worldPosition * cityParallaxSpeed}px)`;
+                stars.style.transform = `translateX(${worldPosition * 0.02}px)`;
+
+                clouds.forEach((cloud, index) => {
+                    const cloudSpeed = 0.2 + (index * 0.05);
+                    cloud.style.transform = `translateX(${worldPosition * cloudSpeed}px)`;
+                });
+            } else if (gameState === 'dorm-room') {
+                // Dorm room movement (similar to starting room)
+                if (keys['a'] && playerPosition < 500) {
+                    playerPosition += speed;
+                    moving = true;
+                    facingLeft = true;
+                }
+                if (keys['d'] && playerPosition > -500) {
+                    playerPosition -= speed;
+                    moving = true;
+                    facingLeft = false;
+                }
+
+                // Show tired prompt if player should go to their room
+                if (shouldGoToRoom) {
+                    tiredPrompt.style.display = 'block';
+                    dormEPrompt.style.display = 'none';
+                }
+                // Show E prompt when near the heart (left side) and letter not opened yet
+                else if (playerPosition > 150 && playerPosition < 350 && !letterOpened) {
+                    dormEPrompt.style.display = 'block';
+                    tiredPrompt.style.display = 'none';
+                } else {
+                    dormEPrompt.style.display = 'none';
+                    tiredPrompt.style.display = 'none';
+                }
+
+                // Move player in dorm room
+                player.style.left = `calc(50% + ${-playerPosition}px)`;
+            }
+
+            // Update character sprite (same for both scenes)
+            if (moving) {
+                frameCounter++;
+
+                if (frameCounter >= 10) {
+                    frameCounter = 0;
+                    walkFrame = (walkFrame + 1) % 3;
+                }
+
+                if (walkFrame === 0) {
+                    player.style.backgroundImage = "url('maddie_move.png')";
+                } else if (walkFrame === 1) {
+                    player.style.backgroundImage = "url('maddie_stride.png')";
+                } else {
+                    player.style.backgroundImage = "url('maddie_still.png')";
+                }
+            } else {
+                player.style.backgroundImage = "url('maddie_still.png')";
+                walkFrame = 0;
+                frameCounter = 0;
+            }
+
+            // Flip character based on direction
+            if (facingLeft) {
+                player.style.transform = 'translateX(-50%) scaleX(-1)';
+            } else {
+                player.style.transform = 'translateX(-50%) scaleX(1)';
+            }
+
+            requestAnimationFrame(update);
+        }
+
+        update();
+
+        // Show starting room notification after game loads
+        showStartingRoomNotification();
+    </script>
+</body>
+</html>
