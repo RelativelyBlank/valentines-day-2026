@@ -1242,6 +1242,34 @@
             z-index: 10006;
         }
 
+        /* Jeff character on right */
+        .jeff-character {
+            position: absolute;
+            right: 5%;
+            bottom: 10%;
+            width: 55vh;
+            height: 55vh;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            z-index: 10006;
+            display: none;
+        }
+
+        /* Hugging image */
+        .hugging-image {
+            position: absolute;
+            left: 5%;
+            bottom: 10%;
+            width: 70vh;
+            height: 70vh;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            z-index: 10007;
+            display: none;
+        }
+
         /* Credits images moving */
         .credits-image {
             position: absolute;
@@ -1443,6 +1471,8 @@
     <!-- Credits screen -->
     <div class="credits-screen" id="credits-screen">
         <div class="credits-character" id="credits-character"></div>
+        <div class="jeff-character" id="jeff-character"></div>
+        <div class="hugging-image" id="hugging-image"></div>
         <div class="credits-content">
             <h2>Valentine's Day 2026</h2>
 
@@ -1499,6 +1529,8 @@
         const creditsScreen = document.getElementById('credits-screen');
         const confettiContainer = document.getElementById('confetti-container');
         const creditsCharacter = document.getElementById('credits-character');
+        const jeffCharacter = document.getElementById('jeff-character');
+        const huggingImage = document.getElementById('hugging-image');
         const smartphone = document.getElementById('smartphone');
         const notificationBadge = document.getElementById('notification-badge');
         const phonePrompt = document.getElementById('phone-prompt');
@@ -2259,6 +2291,87 @@
             }, 100);
         }
 
+        // Preload Jeff images
+        const jeffImages = {};
+        function preloadJeffImages() {
+            const imageNames = ['jeff_relaxed', 'jeff_compressed_legs', 'jeff_part_running', 'jeff_fully_running', 'jeff_maddie_hugging'];
+            imageNames.forEach(name => {
+                const img = new Image();
+                img.src = name + '.png';
+                jeffImages[name] = img;
+            });
+        }
+        preloadJeffImages();
+
+        // Jeff animation sequence
+        function startJeffSequence() {
+            // After 40 seconds (when credits finish rolling), show Jeff and start sequence
+            setTimeout(() => {
+                // Stop Maddie's walking animation
+                clearInterval(creditsAnimationInterval);
+                creditsCharacter.style.backgroundImage = "url('maddie_still.png')";
+
+                // Show Jeff on the right, facing away (not flipped)
+                jeffCharacter.style.display = 'block';
+                jeffCharacter.style.backgroundImage = "url('jeff_relaxed.png')";
+                jeffCharacter.style.right = '-15%'; // Start off-screen to the right
+
+                // After 1 second, flip Jeff around
+                setTimeout(() => {
+                    jeffCharacter.style.transform = 'scaleX(-1)';
+
+                    // After another 0.5 seconds, start running animation
+                    setTimeout(() => {
+                        let runFrame = 0;
+                        let frameCounter = 0;
+                        let jeffPosition = -15; // Start at -15% from right
+                        let speed = 0.3; // Starting speed
+                        const acceleration = 0.03; // Speed increase per frame
+
+                        const runFrames = [
+                            "url('jeff_compressed_legs.png')",
+                            "url('jeff_part_running.png')",
+                            "url('jeff_fully_running.png')"
+                        ];
+
+                        // Set initial running frame
+                        jeffCharacter.style.backgroundImage = runFrames[0];
+
+                        const runInterval = setInterval(() => {
+                            // Move Jeff to the left with increasing speed
+                            jeffPosition += speed;
+                            speed += acceleration;
+                            jeffCharacter.style.right = jeffPosition + '%';
+
+                            frameCounter++;
+
+                            // Cycle between 3 frames every 3 ticks
+                            if (frameCounter % 3 === 0) {
+                                runFrame = (runFrame + 1) % 3;
+                                jeffCharacter.style.backgroundImage = runFrames[runFrame];
+                            }
+
+                            // Check if Jeff reached Maddie - stop when edges touch
+                            // Both characters are 55vh wide, Maddie is at left 5%
+                            // Jeff should stop around 50% to account for character widths
+                            if (jeffPosition >= 50) {
+                                clearInterval(runInterval);
+
+                                // Hide both characters
+                                jeffCharacter.style.display = 'none';
+                                creditsCharacter.style.display = 'none';
+
+                                // Show hugging image at Maddie's position (flipped since Jeff is on left)
+                                huggingImage.style.display = 'block';
+                                huggingImage.style.backgroundImage = "url('jeff_maddie_hugging.png')";
+                                huggingImage.style.transform = 'scaleX(-1)';
+                            }
+                        }, 60); // Run animation every 60ms
+                    }, 500);
+                }, 1000);
+            }, 40000); // Start Jeff sequence after 40 seconds (when credits finish)
+        }
+
         // Create moving images in credits from credits_images folder
         function createMovingImages() {
             // List of images to load from the credits_images folder
@@ -2319,6 +2432,9 @@
 
                 // Start credits character animation
                 animateCreditsCharacter();
+
+                // Start Jeff animation sequence
+                startJeffSequence();
 
                 // Start moving images
                 createMovingImages();
