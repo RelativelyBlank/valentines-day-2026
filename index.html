@@ -1551,7 +1551,7 @@
         let gameState = 'starting-room'; // 'starting-room', 'city', 'dorm-room'
         let playerPosition = 0; // Player position in starting room
         let worldPosition = 0; // Will be set when entering city
-        const speed = 5;
+        const speed = 9;
         const cityParallaxSpeed = 0.05;
         let cityWidth = 0; // Will be calculated dynamically based on images
         let cityImagesLoaded = false;
@@ -2704,7 +2704,7 @@
             if (moving) {
                 frameCounter++;
 
-                if (frameCounter >= 10) {
+                if (frameCounter >= 5) {
                     frameCounter = 0;
                     walkFrame = (walkFrame + 1) % 3;
                 }
